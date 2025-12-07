@@ -40,7 +40,7 @@ make
 ./dsa_program
 ```
 
-## 📊 Test Vector (p = 2^511)
+## 📊 Test Vector 
 
 Kết quả chạy chương trình với p bắt đầu từ 2^511:
 
