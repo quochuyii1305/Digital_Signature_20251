@@ -38,9 +38,9 @@ int main() {
     
     printf("\nSimulation of Digital Signature Algorithm\n");
     printf("\nGlobal public key components are:\n");
-    gmp_printf("\nP is: %Zd\n", p);
-    gmp_printf("\nQ is: %Zd\n", q);
-    gmp_printf("\nG is: %Zd\n", g);
+    gmp_printf("\nP is: 0x%Zx\n", p);
+    gmp_printf("\nQ is: 0x%Zx\n", q);
+    gmp_printf("\nG is: 0x%Zx\n", g);
     
     // Sinh khóa riêng x
     mpz_urandomm(x, state, q);
@@ -52,22 +52,22 @@ int main() {
     mpz_urandomb(hashVal, state, mpz_sizeinbase(p, 2));
     
     printf("\nSecret information:\n");
-    gmp_printf("X (private) is: %Zd\n", x);
-    gmp_printf("Y (public) is: %Zd\n", y);
-    gmp_printf("H (mdhash) is: %Zd\n", hashVal);
+    gmp_printf("X (private) is: 0x%Zx\n", x);
+    gmp_printf("Y (public) is: 0x%Zx\n", y);
+    gmp_printf("H (mdhash) is: 0x%Zx\n", hashVal);
     
     // Ký số
     printf("\nGenerating digital signature:\n");
     DSA_sign(hashVal, p, q, g, x, r, s);
-    gmp_printf("R is: %Zd\n", r);
-    gmp_printf("S is: %Zd\n", s);
+    gmp_printf("R is: 0x%Zx\n", r);
+    gmp_printf("S is: 0x%Zx\n", s);
     
     // Xác thực chữ ký
     printf("\nVerifying digital signature:\n");
     bool verified = DSA_verify(hashVal, r, s, p, q, g, y);
     
     if (verified) {
-        gmp_printf("\nSuccess: Digital signature is verified!\n%Zd\n", r);
+        gmp_printf("\nSuccess: Digital signature is verified!\n0x%Zx\n", r);
     } else {
         printf("\nError: Incorrect digital signature\n");
     }
