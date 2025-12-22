@@ -14,42 +14,51 @@ int main() {
     
     // Khai báo biến
     mpz_t p, q, g, x, y, r, s, hashVal;
-    mpz_t temp1, start_p;
     
-    mpz_inits(p, q, g, x, y, r, s, hashVal, temp1, start_p, NULL);
+    mpz_inits(p, q, g, x, y, r, s, hashVal, NULL);
     
     // Sinh các tham số công khai
-    unsigned int p_bits;
+    unsigned int L_bits, N_bits;
 
-    printf("Nhap do dai cua so nguyen to p (vi du: 512 hoac 1024): ");
-    scanf("%u", &p_bits);
-    // start_p = 2^(p_bits - 1)
-    mpz_ui_pow_ui(start_p, 2, p_bits - 1);
-
-
-
-    char *str_p = mpz_get_str(NULL, 10, start_p);
-    getNextPrime(p, str_p);
-    free(str_p);
+    printf("Nhap do dai cua so nguyen to p (L-bit, vi du: 512, 640, 1024, 2048): ");
+    scanf("%u", &L_bits);
     
-    mpz_sub_ui(temp1, p, 1);
-    findQ(q, temp1);
+    // Chọn kích thước N cho q dựa trên L
+    if (L_bits <= 1024) {
+        N_bits = 160;  // DSA chuẩn cho L <= 1024
+    } else if (L_bits <= 2048) {
+        N_bits = 224;  // DSA chuẩn cho L = 2048
+    } else {
+        N_bits = 256;  // DSA chuẩn cho L = 3072
+    }
+    
+    printf("Dang sinh tham so DSA (L=%u, N=%u)...\n", L_bits, N_bits);
+    printf("Qua trinh nay co the mat vai giay...\n");
+    
+    // Sinh p và q theo chuẩn DSA
+    generateDSAParams(p, q, L_bits, N_bits, state);
+    
+    // Sinh generator g
     getGen(g, p, q, state);
     
     printf("\nSimulation of Digital Signature Algorithm\n");
     printf("\nGlobal public key components are:\n");
-    gmp_printf("\nP is: 0x%Zx\n", p);
-    gmp_printf("\nQ is: 0x%Zx\n", q);
+    gmp_printf("\nP (%u bits): 0x%Zx\n", L_bits, p);
+    gmp_printf("\nQ (%u bits): 0x%Zx\n", N_bits, q);
     gmp_printf("\nG is: 0x%Zx\n", g);
     
     // Sinh khóa riêng x
     mpz_urandomm(x, state, q);
+    while (mpz_cmp_ui(x, 0) == 0) {
+        mpz_urandomm(x, state, q);
+    }
     
     // Tính khóa công khai y = g^x mod p
     mpz_powm(y, g, x, p);
     
-    // Sinh hash giả lập
-    mpz_urandomb(hashVal, state, mpz_sizeinbase(p, 2));
+    // Sinh hash giả lập (kích thước bằng q để đảm bảo tính bảo mật)
+    mpz_urandomb(hashVal, state, N_bits);
+    mpz_mod(hashVal, hashVal, q);
     
     printf("\nSecret information:\n");
     gmp_printf("X (private) is: 0x%Zx\n", x);
@@ -67,13 +76,13 @@ int main() {
     bool verified = DSA_verify(hashVal, r, s, p, q, g, y);
     
     if (verified) {
-        gmp_printf("\nSuccess: Digital signature is verified!\n0x%Zx\n", r);
+        gmp_printf("\nSuccess: Digital signature is verified!\nR = 0x%Zx\n", r);
     } else {
         printf("\nError: Incorrect digital signature\n");
     }
     
     // Giải phóng bộ nhớ
-    mpz_clears(p, q, g, x, y, r, s, hashVal, temp1, start_p, NULL);
+    mpz_clears(p, q, g, x, y, r, s, hashVal, NULL);
     gmp_randclear(state);
     
     return 0;
