@@ -20,22 +20,17 @@ int main() {
     // Sinh các tham số công khai
     unsigned int L_bits, N_bits;
 
-    printf("Nhap do dai cua so nguyen to p (L-bit, vi du: 512, 640, 1024, 2048): ");
+    printf("Nhap do dai cua so nguyen to p (L-bit, vi du: 512, 640, 1024): ");
     scanf("%u", &L_bits);
     
     // Chọn kích thước N cho q dựa trên L
     if (L_bits <= 1024) {
-        N_bits = 160;  // DSA chuẩn cho L <= 1024
-    } else if (L_bits <= 2048) {
-        N_bits = 224;  // DSA chuẩn cho L = 2048
-    } else {
-        N_bits = 256;  // DSA chuẩn cho L = 3072
+        N_bits = 160;  
     }
     
-    printf("Dang sinh tham so DSA (L=%u, N=%u)...\n", L_bits, N_bits);
-    printf("Qua trinh nay co the mat vai giay...\n");
+
     
-    // Sinh p và q theo chuẩn DSA
+    // Sinh p và q 
     generateDSAParams(p, q, L_bits, N_bits, state);
     
     // Sinh generator g
@@ -56,7 +51,7 @@ int main() {
     // Tính khóa công khai y = g^x mod p
     mpz_powm(y, g, x, p);
     
-    // Sinh hash giả lập (kích thước bằng q để đảm bảo tính bảo mật)
+    // Sinh hash giả lập (kích thước bằng q)
     mpz_urandomb(hashVal, state, N_bits);
     mpz_mod(hashVal, hashVal, q);
     

@@ -14,7 +14,7 @@ void DSA_sign(const mpz_t message_hash, const mpz_t p, const mpz_t q,
     mpz_t k, k_inv, temp1, temp2;
     mpz_inits(k, k_inv, temp1, temp2, NULL);
     
-    // Generate random k in range [1, q-1]
+    // Generate random k in range [0, q-1]
     do {
         mpz_urandomm(k, state, q);
     } while (mpz_cmp_ui(k, 0) == 0);
